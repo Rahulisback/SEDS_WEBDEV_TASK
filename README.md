@@ -7,7 +7,7 @@ The application operates entirely on the client side, utilizing the browser's **
 
 ## Features Implemented
 * **Create Notes:** Easily add new notes with a title and description.
-* **Storage:** Uses `localStorage` to save data; notes are not lost on page reload.
+* **Storage:** Uses localStorage to save data; notes are not lost on page reload.
 * **Edit & Update:** Functionality to modify existing notes seamlessly.
 * **Delete Notes:** Remove individual notes with a confirmation prompt.
 * **Word Count:** Automatically counts and displays the number of words in a note.
@@ -25,8 +25,8 @@ Follow these steps to get the project up and running on your machine:
 
 1. **Create the Project File:**
    - Create a new folder on your computer.
-   - Inside the folder, create a new file named `index.html`.
-   - Paste the source code into `index.html` and save it.
+   - Inside the folder, create a new file named index.html.
+   - Paste the source code into index.html and save it.
 
 2. **Add Image Assets**
    - The code references two background images: space.png (sidebar) and unnamed.jpg (main background).
