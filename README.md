@@ -6,9 +6,9 @@
 The application operates entirely on the client side, utilizing the browser's **LocalStorage** to ensure your notes persist even after you refresh or close the page.
 
 ## Features Implemented
-* **Create Notes:** Easily add new notes with a title and description.
-* **Storage:** Uses localStorage to save data; notes are not lost on page reload.
-* **Edit & Update:** Functionality to modify existing notes seamlessly.
+* **Create Notes:**  add new notes with a title and description.
+* **Storage:** Uses localStorage to save data.
+* **Edit & Update:** Functionality to modify existing notes.
 * **Delete Notes:** Remove individual notes with a confirmation prompt.
 * **Word Count:** Automatically counts and displays the number of words in a note.
 * **Timestamps:** Displays the date and time when a note was created or last updated.
@@ -40,3 +40,6 @@ Follow these steps to get the project up and running on your machine:
    - Type a title and description in the sidebar and click "Add Note".
    - Your note will appear on the right side.
    - Refresh the page to see that your data remains saved!
+## Things I failed to do
+-Better UI
+-Search Feature
