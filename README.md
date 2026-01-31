@@ -41,5 +41,5 @@ Follow these steps to get the project up and running on your machine:
    - Your note will appear on the right side.
    - Refresh the page to see that your data remains saved!
 ## Things I failed to do
--Better UI
--Search Feature
+   -Better UI
+   -Search Feature
