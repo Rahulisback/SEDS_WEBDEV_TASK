@@ -71,21 +71,9 @@
         const noteIdInput = document.getElementById("note-id");
         const addBtn = document.getElementById("add-btn");
         const notesContainer = document.getElementById("notes-container");
-        const searchInput = document.getElementById("search-input");
 
+        // Initial load
         displayNotes();
-
-        searchInput.addEventListener("input", (e) => {
-            const value = e.target.value.toLowerCase(); 
-            const allNotes = getNotes();
-
-            const filteredNotes = allNotes.filter(note => 
-                note.title.toLowerCase().includes(value) || 
-                note.desc.toLowerCase().includes(value)
-            );
-
-            displayNotes(filteredNotes);
-        });
 
         function getNotes() {
             return JSON.parse(localStorage.getItem("notes") || "[]");
@@ -132,21 +120,14 @@
             displayNotes();
         }
 
-        function changeTheme(){
-            
-        }
-
-        function displayNotes(notesList = null) {
-            const notes = notesList || getNotes();
+        // Updated displayNotes to remove filtering logic
+        function displayNotes() {
+            const notes = getNotes();
             
             notesContainer.innerHTML = "";
             
             if(notes.length === 0) {
-                if(searchInput.value) {
-                    notesContainer.innerHTML = "<p>No search results found.</p>";
-                } else {
-                    notesContainer.innerHTML = "<p>No notes yet. Create one!</p>";
-                }
+                notesContainer.innerHTML = "<p>No notes yet. Create one!</p>";
                 return;
             }
 
@@ -163,7 +144,7 @@
                             <button class="edit-btn" onclick="editNote(${note.id})">Edit</button>
                             <button class="delete-btn" onclick="deleteNote(${note.id})">Delete</button>
                         </div>
-                        <small>${countWords(note.desc)}</small>
+                        <small>${countWords(note.desc)} words</small>
                     </div>
                 `;
                 notesContainer.appendChild(noteDiv);
@@ -171,8 +152,9 @@
         }
 
         function countWords(str){
+            if (!str) return 0;
             const words = str.trim().split(/\s+/);
-            return words.length;
+            return words[0] === "" ? 0 : words.length;
         }
 
         function deleteNote(id) {
