@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notes App</title>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { background-color: white; height: 100vh; display: flex; justify-content: center; }
+        
+        .container { display: flex; width: 100%; max-width: 1700px; height: 100vh; background: white; }
+        
+        .title-container{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar { width: 1400px; background-image: url("space.png"); color: white; padding: 20px; display: flex; flex-direction: column; background-size: cover;}
+        .note-form { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+        
+        input, textarea { padding: 12px; border: none; border-radius: 5px; font-size: 16px; }
+        textarea { height: 150px; resize: none; } 
+        
+        button#add-btn { background-color: #27ae60; color: white; padding: 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button#add-btn:hover { background-color: #219150; cursor:pointer;}
+
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; background-image: url("unnamed.jpg"); background-size: cover; } 
+        .main-content h1 {color: white;}
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .clear-btn { background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 5px 15px; cursor: pointer; }
+        
+        .notes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        
+        .note-card { background: #fff; border: 1px solid #eee; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .note-card h3 { margin-bottom: 10px; color: #2c3e50; }
+        .note-card p { color: #7f8c8d; white-space: pre-wrap; margin-bottom: 15px; } 
+        .note-actions button { margin-right: 10px; cursor: pointer; border: none; background: none; }
+        .edit-btn { color: #3498db; }
+        .delete-btn { color: #e74c3c; }
+        
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="title-container">
+                <h2>📝 QuickNotes</h2>
+            </div>
+            <div class="note-form">
+                <input type="hidden" id="note-id">
+                <input type="text" id="note-title" placeholder="Note Title">
+                <textarea id="note-desc" placeholder="Write your note here..."></textarea>
+                <button id="add-btn" onclick="saveNote()">Add Note</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header>
+                <h1>My Notes</h1>
+                <button class="clear-btn" onclick="clearAllNotes()">Clear All</button>
+            </header>
+            <div id="notes-container" class="notes-grid"></div>
+        </main>
+    </div>
+
+    <script>
+        const noteTitleInput = document.getElementById("note-title");
+        const noteDescInput = document.getElementById("note-desc");
+        const noteIdInput = document.getElementById("note-id");
+        const addBtn = document.getElementById("add-btn");
+        const notesContainer = document.getElementById("notes-container");
+        const searchInput = document.getElementById("search-input");
+
+        displayNotes();
+
+        searchInput.addEventListener("input", (e) => {
+            const value = e.target.value.toLowerCase(); 
+            const allNotes = getNotes();
+
+            const filteredNotes = allNotes.filter(note => 
+                note.title.toLowerCase().includes(value) || 
+                note.desc.toLowerCase().includes(value)
+            );
+
+            displayNotes(filteredNotes);
+        });
+
+        function getNotes() {
+            return JSON.parse(localStorage.getItem("notes") || "[]");
+        }
+
+        function saveNote() {
+            const title = noteTitleInput.value.trim();
+            const desc = noteDescInput.value.trim();
+            const id = noteIdInput.value;
+
+            if (!title || !desc) {
+                alert("Please enter title and description");
+                return;
+            }
+
+            let notes = getNotes();
+
+            if (id) {
+                const noteIndex = notes.findIndex(n => n.id == id);
+                if (noteIndex > -1) {
+                    notes[noteIndex].title = title;
+                    notes[noteIndex].desc = desc;
+                    notes[noteIndex].date = new Date().toLocaleDateString();
+                    notes[noteIndex].time = new Date().toLocaleTimeString();
+                    
+                    addBtn.innerText = "Add Note";
+                    noteIdInput.value = ""; 
+                }
+            } else {
+                notes.push({
+                    id: Date.now(),
+                    title: title,
+                    desc: desc,
+                    date: new Date().toLocaleDateString(),
+                    time: new Date().toLocaleTimeString()
+                });
+            }
+
+            localStorage.setItem("notes", JSON.stringify(notes));
+            
+            noteTitleInput.value = "";
+            noteDescInput.value = "";
+            
+            displayNotes();
+        }
+
+        function changeTheme(){
+            
+        }
+
+        function displayNotes(notesList = null) {
+            const notes = notesList || getNotes();
+            
+            notesContainer.innerHTML = "";
+            
+            if(notes.length === 0) {
+                if(searchInput.value) {
+                    notesContainer.innerHTML = "<p>No search results found.</p>";
+                } else {
+                    notesContainer.innerHTML = "<p>No notes yet. Create one!</p>";
+                }
+                return;
+            }
+
+            notes.forEach(note => {
+                const noteDiv = document.createElement("div");
+                noteDiv.classList.add("note-card");
+                
+                noteDiv.innerHTML = `
+                    <h3>${note.title}</h3>
+                    <p>${note.desc}</p>
+                    <div class="note-meta">
+                        <small>${note.date} ${note.time}</small>
+                        <div class="note-actions">
+                            <button class="edit-btn" onclick="editNote(${note.id})">Edit</button>
+                            <button class="delete-btn" onclick="deleteNote(${note.id})">Delete</button>
+                        </div>
+                        <small>${countWords(note.desc)}</small>
+                    </div>
+                `;
+                notesContainer.appendChild(noteDiv);
+            });
+        }
+
+        function countWords(str){
+            const words = str.trim().split(/\s+/);
+            return words.length;
+        }
+
+        function deleteNote(id) {
+            if(confirm("Delete this note?")) {
+                let notes = getNotes();
+                notes = notes.filter(n => n.id != id);
+                localStorage.setItem("notes", JSON.stringify(notes));
+                displayNotes();
+            }
+        }
+
+        function editNote(id) {
+            const notes = getNotes();
+            const note = notes.find(n => n.id == id);
+            
+            if(note) {
+                noteTitleInput.value = note.title;
+                noteDescInput.value = note.desc;
+                noteIdInput.value = note.id; 
+                addBtn.innerText = "Update Note";
+            }
+        }
+
+        function clearAllNotes() {
+            if(confirm("Clear all notes?")) {
+                localStorage.removeItem("notes");
+                displayNotes();
+            }
+        }
+    </script>
+</body>
+</html>
